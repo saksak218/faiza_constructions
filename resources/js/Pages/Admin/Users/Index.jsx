@@ -1,0 +1,305 @@
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import Modal from '@/Components/Modal';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import { toast, Toaster } from 'react-hot-toast';
+
+export default function Index({ auth, users }) {
+    const [showModal, setShowModal] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+
+    const defaultValues = {
+        name: '',
+        email: '',
+        password: '',
+    };
+
+    const {
+        data,
+        setData,
+        post,
+        put,
+        delete: destroy,
+        processing,
+        errors,
+        reset,
+        clearErrors,
+    } = useForm(defaultValues);
+
+    const handleClose = () => {
+        setShowModal(false);
+        setEditingUser(null);
+        reset();
+        setData(defaultValues);
+        clearErrors(); // Add this line
+    };
+
+    const submitForm = (e) => {
+        e.preventDefault();
+        if (editingUser) {
+            put(route('admin.users.update', editingUser.id), {
+                onSuccess: () => {
+                    handleClose();
+                    toast.success('User updated successfully');
+                },
+                onError: () => {
+                    toast.error('Failed to update user');
+                },
+            });
+        } else {
+            post(route('admin.users.store'), {
+                onSuccess: () => {
+                    handleClose();
+                    toast.success('User created successfully');
+                },
+                onError: () => {
+                    toast.error('Failed to create user');
+                },
+            });
+        }
+    };
+
+    const openEditModal = (user) => {
+        clearErrors(); // Add this line
+        setEditingUser(user);
+        setData({
+            name: user.name || '',
+            email: user.email || '',
+            password: '',
+        });
+        setShowModal(true);
+    };
+
+    const openCreateModal = () => {
+        clearErrors(); // Add this line
+        setEditingUser(null);
+        setData(defaultValues);
+        setShowModal(true);
+    };
+
+    // const deleteUser = (user) => {
+    //     if (confirm('Are you sure you want to delete this user?')) {
+    //         destroy(route('admin.users.destroy', user.id));
+    //     }
+    // };
+
+    const openDeleteModal = (user) => {
+        setUserToDelete(user);
+        setDeleteModalOpen(true);
+    };
+    const handleDelete = () => {
+        if (userToDelete) {
+            destroy(route('admin.users.destroy', userToDelete.id), {
+                onSuccess: () => {
+                    setDeleteModalOpen(false);
+                    setUserToDelete(null);
+                    toast.success('User deleted successfully');
+                },
+                onError: () => {
+                    toast.error('Failed to delete user');
+                },
+            });
+        }
+    };
+
+    return (
+        <AuthenticatedLayout
+            user={auth.user}
+            header={
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Users
+                </h2>
+            }
+        >
+            <Toaster position="top-right" />
+            <Head title="Users" />
+
+            <div className="py-12">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <div className="p-6 text-gray-900">
+                            <div className="mb-4">
+                                <button
+                                    onClick={openCreateModal}
+                                    className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+                                >
+                                    Add New User
+                                </button>
+                            </div>
+
+                            <table className="min-w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            Name
+                                        </th>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            Email
+                                        </th>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {users.map((user) => (
+                                        <tr key={user.id}>
+                                            <td className="border-b border-gray-200 px-6 py-4">
+                                                {user.name}
+                                            </td>
+                                            <td className="border-b border-gray-200 px-6 py-4">
+                                                {user.email}
+                                            </td>
+                                            <td className="border-b border-gray-200 px-6 py-4">
+                                                <button
+                                                    onClick={() =>
+                                                        openEditModal(user)
+                                                    }
+                                                    className="mr-4 text-blue-600 hover:text-blue-900"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        openDeleteModal(user)
+                                                    }
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            <Modal show={showModal} onClose={handleClose}>
+                                <form onSubmit={submitForm} className="p-6">
+                                    <h2 className="text-lg font-medium text-gray-900">
+                                        {editingUser
+                                            ? 'Edit User'
+                                            : 'Create New User'}
+                                    </h2>
+
+                                    <div className="mt-6">
+                                        <InputLabel
+                                            htmlFor="name"
+                                            value="Name"
+                                        />
+                                        <TextInput
+                                            id="name"
+                                            type="text"
+                                            className="mt-1 block w-full"
+                                            value={data.name}
+                                            onChange={(e) =>
+                                                setData('name', e.target.value)
+                                            }
+                                            required
+                                        />
+                                        <InputError
+                                            message={errors.name}
+                                            className="mt-2"
+                                        />
+                                    </div>
+
+                                    <div className="mt-6">
+                                        <InputLabel
+                                            htmlFor="email"
+                                            value="Email"
+                                        />
+                                        <TextInput
+                                            id="email"
+                                            type="email"
+                                            className="mt-1 block w-full"
+                                            value={data.email}
+                                            onChange={(e) =>
+                                                setData('email', e.target.value)
+                                            }
+                                            required
+                                        />
+                                        <InputError
+                                            message={errors.email}
+                                            className="mt-2"
+                                        />
+                                    </div>
+
+                                    <div className="mt-6">
+                                        <InputLabel
+                                            htmlFor="password"
+                                            value={`Password ${editingUser ? '(leave blank to keep current)' : ''}`}
+                                        />
+                                        <TextInput
+                                            id="password"
+                                            type="password"
+                                            className="mt-1 block w-full"
+                                            value={data.password}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'password',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            required={!editingUser}
+                                        />
+                                        <InputError
+                                            message={errors.password}
+                                            className="mt-2"
+                                        />
+                                    </div>
+
+                                    <div className="mt-6 flex justify-end">
+                                        <PrimaryButton
+                                            type="submit"
+                                            disabled={processing}
+                                        >
+                                            {editingUser
+                                                ? 'Update User'
+                                                : 'Create User'}
+                                        </PrimaryButton>
+                                    </div>
+                                </form>
+                            </Modal>
+
+                            <Modal
+                                show={deleteModalOpen}
+                                onClose={() => setDeleteModalOpen(false)}
+                            >
+                                <div className="p-6">
+                                    <h2 className="text-lg font-medium text-gray-900">
+                                        Confirm Delete
+                                    </h2>
+                                    <p className="mt-2 text-gray-600">
+                                        Are you sure you want to delete this
+                                        user? This action cannot be undone.
+                                    </p>
+                                    <div className="mt-6 flex justify-end space-x-3">
+                                        <button
+                                            onClick={() =>
+                                                setDeleteModalOpen(false)
+                                            }
+                                            className="rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleDelete}
+                                            className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                                        >
+                                            Delete User
+                                        </button>
+                                    </div>
+                                </div>
+                            </Modal>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </AuthenticatedLayout>
+    );
+}
