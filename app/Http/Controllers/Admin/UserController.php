@@ -15,7 +15,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::where('role', 2)->get(); // Get only non-admin users
-        
+
         return Inertia::render('Admin/Users/Index', [
             'users' => $users
         ]);
@@ -26,11 +26,14 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', Password::min(8)
-                ->letters()
-                ->mixedCase()
-                ->numbers()
-                ->symbols()],
+            'password' => [
+                'required',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+            ],
         ]);
 
         User::create([
@@ -60,7 +63,7 @@ class UserController extends Controller
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        
+
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }

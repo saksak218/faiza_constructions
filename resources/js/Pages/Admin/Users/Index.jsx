@@ -7,6 +7,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
+import User from './User';
 
 export default function Index({ auth, users }) {
     const [showModal, setShowModal] = useState(false);
@@ -83,12 +84,6 @@ export default function Index({ auth, users }) {
         setShowModal(true);
     };
 
-    // const deleteUser = (user) => {
-    //     if (confirm('Are you sure you want to delete this user?')) {
-    //         destroy(route('admin.users.destroy', user.id));
-    //     }
-    // };
-
     const openDeleteModal = (user) => {
         setUserToDelete(user);
         setDeleteModalOpen(true);
@@ -149,35 +144,11 @@ export default function Index({ auth, users }) {
                                 </thead>
                                 <tbody>
                                     {users.map((user) => (
-                                        <tr key={user.id}>
-                                            <td className="border-b border-gray-200 px-6 py-4">
-                                                {user.name}
-                                            </td>
-                                            <td className="border-b border-gray-200 px-6 py-4">
-                                                {user.email}
-                                            </td>
-                                            <td className="border-b border-gray-200 px-6 py-4">
-                                                <button
-                                                    onClick={() =>
-                                                        openEditModal(user)
-                                                    }
-                                                    className="mr-4 text-blue-600 hover:text-blue-900"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        openDeleteModal(user)
-                                                    }
-                                                    className="text-red-600 hover:text-red-900"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        <User key={user.id} user={user} openEditModal={openEditModal} openDeleteModal={openDeleteModal} />
                                     ))}
                                 </tbody>
                             </table>
+                                        
 
                             <Modal show={showModal} onClose={handleClose}>
                                 <form onSubmit={submitForm} className="p-6">
