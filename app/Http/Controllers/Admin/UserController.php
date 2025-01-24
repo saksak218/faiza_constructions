@@ -17,7 +17,7 @@ public function index(Request $request)
     $perPage = $request->input('per_page', 10);
     $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 10;
 
-    $query = User::query();
+    $query = User::query()->where('role', 2);
 
     // Existing sorting and search logic
     $sortableColumns = ['name', 'email', 'created_at'];
