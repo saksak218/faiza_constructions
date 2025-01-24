@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import User from './User';
 
-export default function Index({ auth, users }) {
+export default function Index({ auth, users, sort, direction }) {
     const [showModal, setShowModal] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -132,19 +132,25 @@ export default function Index({ auth, users }) {
                                 <thead>
                                 <tr>
                                     <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
-                                        <Link href={route('admin.users', {
-                                            sort: 'name',
-                                            direction: 'asc'
-                                        })}>
-                                            Name
+                                        <Link
+                                            href={route('admin.users', {
+                                                sort: 'name',
+                                                direction: sort === 'name' && direction === 'asc' ? 'desc' : 'asc'
+                                            })}
+                                            className={`${sort === 'name' ? 'font-bold' : ''}`}
+                                        >
+                                            Name {sort === 'name' && (direction === 'asc' ? '▲' : '▼')}
                                         </Link>
                                     </th>
                                     <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
-                                        <Link href={route('admin.users', {
-                                            sort: 'email',
-                                            direction: 'asc'
-                                        })}>
-                                            Email
+                                        <Link
+                                            href={route('admin.users', {
+                                                sort: 'email',
+                                                direction: sort === 'email' && direction === 'asc' ? 'desc' : 'asc'
+                                            })}
+                                            className={`${sort === 'email' ? 'font-bold' : ''}`}
+                                        >
+                                            Email {sort === 'email' && (direction === 'asc' ? '▲' : '▼')}
                                         </Link>
                                     </th>
                                     <th className="border-b-2 border-gray-200 px-6 py-3 text-left">

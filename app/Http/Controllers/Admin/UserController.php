@@ -12,21 +12,27 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
-    {
+public function index(Request $request)
+{
+    $query = User::query();
 
-        $query = User::query();
+    $sortableColumns = ['name', 'email', 'created_at']; // Define allowed columns
+    $sortColumn = $request->input('sort', 'created_at');
+    $sortDirection = $request->input('direction', 'desc');
 
-        if ($request->has('sort')) {
-            $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
-        }
-
-        $users = $query->paginate(10)->appends($request->query()); // Get only non-admin users
-
-        return Inertia::render('Admin/Users/Index', [
-            'users' => $users
-        ]);
+    // Validate sort column and direction
+    if (in_array($sortColumn, $sortableColumns)) {
+        $query->orderBy($sortColumn, $sortDirection === 'asc' ? 'asc' : 'desc');
     }
+
+    $users = $query->paginate(10)->appends($request->query());
+
+    return Inertia::render('Admin/Users/Index', [
+        'users' => $users,
+        'sort' => $sortColumn,
+        'direction' => $sortDirection
+    ]);
+}
 
     public function store(Request $request)
     {
