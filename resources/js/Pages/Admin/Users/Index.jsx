@@ -4,7 +4,7 @@ import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import User from './User';
@@ -130,25 +130,59 @@ export default function Index({ auth, users }) {
 
                             <table className="min-w-full">
                                 <thead>
-                                    <tr>
-                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                <tr>
+                                    <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                        <Link href={route('admin.users', {
+                                            sort: 'name',
+                                            direction: 'asc'
+                                        })}>
                                             Name
-                                        </th>
-                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                        </Link>
+                                    </th>
+                                    <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                        <Link href={route('admin.users', {
+                                            sort: 'email',
+                                            direction: 'asc'
+                                        })}>
                                             Email
-                                        </th>
-                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
-                                            Actions
-                                        </th>
-                                    </tr>
+                                        </Link>
+                                    </th>
+                                    <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                        Actions
+                                    </th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    {users.map((user) => (
-                                        <User key={user.id} user={user} openEditModal={openEditModal} openDeleteModal={openDeleteModal} />
-                                    ))}
+                                {users.data.map((user) => (
+                                    <User key={user.id} user={user} openEditModal={openEditModal}
+                                          openDeleteModal={openDeleteModal} />
+                                ))}
                                 </tbody>
                             </table>
-                                        
+
+
+                            <div className="flex items-center justify-center space-x-2 mt-4">
+                                {users.links.map((link, index) => (
+                                    <Link
+                                        key={index}
+                                        href={link.url}
+                                        className={`px-3 py-1 rounded ${
+                                            link.active
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-200 text-gray-700 hover:bg-blue-100'
+                                        }`}
+                                    >
+                                        {link.label === '&laquo;' ? (
+                                            <span>&#8592; {/* Left Arrow */}</span>
+                                        ) : link.label === '&raquo;' ? (
+                                            <span>&#8594; {/* Right Arrow */}</span>
+                                        ) : (
+                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                        )}
+                                    </Link>
+                                ))}
+                            </div>
+
 
                             <Modal show={showModal} onClose={handleClose}>
                                 <form onSubmit={submitForm} className="p-6">

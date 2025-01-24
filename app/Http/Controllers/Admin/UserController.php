@@ -12,9 +12,16 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::where('role', 2)->get(); // Get only non-admin users
+
+        $query = User::query();
+
+        if ($request->has('sort')) {
+            $query->orderBy($request->input('sort'), $request->input('direction', 'asc'));
+        }
+
+        $users = $query->paginate(10)->appends($request->query()); // Get only non-admin users
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users
