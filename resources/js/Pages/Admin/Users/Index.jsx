@@ -9,12 +9,13 @@ import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import User from './User';
 
-export default function Index({ auth, users, sort, direction, search }) {
+export default function Index({ auth, users, sort, direction, search, per_page }) {
     const [showModal, setShowModal] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
     const [searchTerm, setSearchTerm] = useState(search || '');
+    const [perPage, setPerPage] = useState(per_page || 10);
 
     const defaultValues = {
         name: '',
@@ -109,7 +110,22 @@ export default function Index({ auth, users, sort, direction, search }) {
         router.get(route('admin.users'), {
             search: searchTerm,
             sort,
-            direction
+            direction,
+            per_page: perPage
+        }, {
+            preserveState: true,
+            preserveScroll: true
+        });
+    };
+
+    const handlePerPageChange = (e) => {
+        const newPerPage = e.target.value;
+        setPerPage(newPerPage);
+        router.get(route('admin.users'), {
+            search: searchTerm,
+            sort,
+            direction,
+            per_page: newPerPage
         }, {
             preserveState: true,
             preserveScroll: true
@@ -134,8 +150,10 @@ export default function Index({ auth, users, sort, direction, search }) {
 
 
                         <div className="p-6 text-gray-900">
+
+
                             <div className="mb-4 flex justify-between items-center">
-                                <form onSubmit={handleSearch} className="flex">
+                                <form onSubmit={handleSearch} className="flex items-center space-x-2">
                                     <input
                                         type="text"
                                         value={searchTerm}
@@ -149,7 +167,19 @@ export default function Index({ auth, users, sort, direction, search }) {
                                     >
                                         Search
                                     </button>
+
+                                    <select
+                                        value={perPage}
+                                        onChange={handlePerPageChange}
+                                        className="appearance-none bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2.5 pr-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    >
+                                        <option value="10">10 per page</option>
+                                        <option value="25">25 per page</option>
+                                        <option value="50">50 per page</option>
+                                        <option value="100">100 per page</option>
+                                    </select>
                                 </form>
+
                                 <button
                                     onClick={openCreateModal}
                                     className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
@@ -162,7 +192,7 @@ export default function Index({ auth, users, sort, direction, search }) {
                             <table className="min-w-full">
                                 <thead>
                                 <tr>
-                                    <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
                                         <Link
                                             href={route('admin.users', {
                                                 sort: 'name',

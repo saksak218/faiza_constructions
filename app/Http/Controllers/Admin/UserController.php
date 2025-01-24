@@ -14,9 +14,12 @@ class UserController extends Controller
 {
 public function index(Request $request)
 {
+    $perPage = $request->input('per_page', 10);
+    $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 10;
+
     $query = User::query();
 
-    // Sorting
+    // Existing sorting and search logic
     $sortableColumns = ['name', 'email', 'created_at'];
     $sortColumn = $request->input('sort', 'created_at');
     $sortDirection = $request->input('direction', 'desc');
@@ -25,7 +28,6 @@ public function index(Request $request)
         $query->orderBy($sortColumn, $sortDirection === 'asc' ? 'asc' : 'desc');
     }
 
-    // Search
     if ($request->filled('search')) {
         $search = $request->input('search');
         $query->where(function($q) use ($search) {
@@ -34,13 +36,14 @@ public function index(Request $request)
         });
     }
 
-    $users = $query->paginate(10)->appends($request->query());
+    $users = $query->paginate($perPage)->appends($request->query());
 
     return Inertia::render('Admin/Users/Index', [
         'users' => $users,
         'sort' => $sortColumn,
         'direction' => $sortDirection,
-        'search' => $request->input('search', '')
+        'search' => $request->input('search', ''),
+        'per_page' => $perPage
     ]);
 }
 
