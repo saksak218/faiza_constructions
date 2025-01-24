@@ -16,13 +16,22 @@ public function index(Request $request)
 {
     $query = User::query();
 
-    $sortableColumns = ['name', 'email', 'created_at']; // Define allowed columns
+    // Sorting
+    $sortableColumns = ['name', 'email', 'created_at'];
     $sortColumn = $request->input('sort', 'created_at');
     $sortDirection = $request->input('direction', 'desc');
 
-    // Validate sort column and direction
     if (in_array($sortColumn, $sortableColumns)) {
         $query->orderBy($sortColumn, $sortDirection === 'asc' ? 'asc' : 'desc');
+    }
+
+    // Search
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
     }
 
     $users = $query->paginate(10)->appends($request->query());
@@ -30,7 +39,8 @@ public function index(Request $request)
     return Inertia::render('Admin/Users/Index', [
         'users' => $users,
         'sort' => $sortColumn,
-        'direction' => $sortDirection
+        'direction' => $sortDirection,
+        'search' => $request->input('search', '')
     ]);
 }
 

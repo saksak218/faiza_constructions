@@ -4,16 +4,17 @@ import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router  } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import User from './User';
 
-export default function Index({ auth, users, sort, direction }) {
+export default function Index({ auth, users, sort, direction, search }) {
     const [showModal, setShowModal] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [searchTerm, setSearchTerm] = useState(search || '');
 
     const defaultValues = {
         name: '',
@@ -103,6 +104,18 @@ export default function Index({ auth, users, sort, direction }) {
         }
     };
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        router.get(route('admin.users'), {
+            search: searchTerm,
+            sort,
+            direction
+        }, {
+            preserveState: true,
+            preserveScroll: true
+        });
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -118,8 +131,25 @@ export default function Index({ auth, users, sort, direction }) {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+
+
                         <div className="p-6 text-gray-900">
-                            <div className="mb-4">
+                            <div className="mb-4 flex justify-between items-center">
+                                <form onSubmit={handleSearch} className="flex">
+                                    <input
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        placeholder="Search users..."
+                                        className="border rounded-l px-2 py-1"
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="bg-blue-500 text-white px-4 py-1 rounded-r"
+                                    >
+                                        Search
+                                    </button>
+                                </form>
                                 <button
                                     onClick={openCreateModal}
                                     className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
@@ -127,6 +157,7 @@ export default function Index({ auth, users, sort, direction }) {
                                     Add New User
                                 </button>
                             </div>
+
 
                             <table className="min-w-full">
                                 <thead>
