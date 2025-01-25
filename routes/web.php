@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ConstructionJobController;
 use App\Http\Controllers\ProfileController;
+use App\Models\ConstructionJob;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,7 +23,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     //     ->name('admin.dashboard');
 
     Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
+        return Inertia::render('Admin/Dashboard', ['jobs' => ConstructionJob::all()]);
     })->name('admin.dashboard');
 
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');

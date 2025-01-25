@@ -64,24 +64,12 @@ class ConstructionJobController extends Controller
         $validated = $request->validate([
             'address' => ['required', 'string', 'max:255'],
             'status' => ['nullable', 'string', 'max:255', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
-            // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            // 'password' => [
-            //     'required',
-            //     Password::min(8)
-            //         ->letters()
-            //         ->mixedCase()
-            //         ->numbers()
-            //         ->symbols()
-            // ],
         ]);
 
 
         ConstructionJob::create([
             'address' => $validated['address'],
             'status'=> $validated['status'],
-            // 'email' => $validated['email'],
-            // 'password' => Hash::make($validated['password']),
-            // 'role' => 2,
             'user_id' => Auth()->id()
         ]);
 
@@ -114,17 +102,6 @@ class ConstructionJobController extends Controller
             'address' => ['required', 'string', 'max:255'],
             'date_inspection' => ['nullable', 'date'],
             'status' => ['nullable', 'string', 'max:255', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
-
-
-            //     // 'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            //     // 'password' => $request->filled('password') ? [
-            //     //     'string',
-            //     //     Password::min(8)
-            //     //         ->letters()
-            //     //         ->mixedCase()
-            //     //         ->numbers()
-            //     //         ->symbols()
-            //     // ] : ['nullable'],
         ]);
 
 
@@ -134,7 +111,6 @@ class ConstructionJobController extends Controller
         $job->date_inspection = $validated['date_inspection'];
         $job->status = $validated['status'];
 
-        // Auth()->jobs->update($constructionJob);
 
         $job->save();
 
