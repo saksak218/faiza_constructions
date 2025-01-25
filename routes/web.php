@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ConstructionJobController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -20,15 +21,21 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     // Route::view('/dashboard', 'admin/Dashboard')
     //     ->name('admin.dashboard');
 
-        Route::get('/dashboard', function () {
-            return Inertia::render('Admin/Dashboard');
-        })->name('admin.dashboard');
+    Route::get('/dashboard', function () {
+        return Inertia::render('Admin/Dashboard');
+    })->name('admin.dashboard');
 
-        Route::get('/users', [UserController::class, 'index'])->name('admin.users');
-        Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
-        Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
-        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::get('/users', [UserController::class, 'index'])->name('admin.users');
+    Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
+
+
+    Route::get('/jobs', [ConstructionJobController::class, 'index'])->name('admin.jobs');
+    Route::post('/jobs', [ConstructionJobController::class, 'store'])->name('admin.jobs.store');
+    Route::put('/jobs/{job}', [ConstructionJobController::class, 'update'])->name('admin.jobs.update');
+    Route::delete('/jobs/{job}', [ConstructionJobController::class, 'destroy'])->name('admin.jobs.destroy');
 
 });
 
@@ -42,4 +49,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
