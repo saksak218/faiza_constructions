@@ -25,6 +25,7 @@ return new class extends Migration {
             $table->string('customer_signature')->nullable();
             $table->string('installer_signature')->nullable();
             $table->string('inspection_image')->nullable();
+            $table->date('date_inspection')->nullable();
             $table->timestamps();
         });
     }

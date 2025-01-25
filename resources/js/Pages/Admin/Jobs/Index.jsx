@@ -4,12 +4,19 @@ import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm, router  } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import Job from './Job';
 
-export default function Index({ auth, jobs, sort, direction, search, per_page }) {
+export default function Index({
+    auth,
+    jobs,
+    sort,
+    direction,
+    search,
+    per_page,
+}) {
     const [showModal, setShowModal] = useState(false);
     const [editingJob, setEditingJob] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -23,6 +30,8 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
         // password: '',
         id: '',
         address: '',
+        status: '',
+        date_inspection: '',
     };
 
     const {
@@ -76,6 +85,8 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
         setData({
             id: job.id || '',
             address: job.address || '',
+            status: job.status || '',
+            date_inspection: job.date_inspection || '',
             // password: '',
         });
         setShowModal(true);
@@ -109,29 +120,37 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.jobs'), {
-            search: searchTerm,
-            sort,
-            direction,
-            per_page: perPage
-        }, {
-            preserveState: true,
-            preserveScroll: true
-        });
+        router.get(
+            route('admin.jobs'),
+            {
+                search: searchTerm,
+                sort,
+                direction,
+                per_page: perPage,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     const handlePerPageChange = (e) => {
         const newPerPage = e.target.value;
         setPerPage(newPerPage);
-        router.get(route('admin.jobs'), {
-            search: searchTerm,
-            sort,
-            direction,
-            per_page: newPerPage
-        }, {
-            preserveState: true,
-            preserveScroll: true
-        });
+        router.get(
+            route('admin.jobs'),
+            {
+                search: searchTerm,
+                sort,
+                direction,
+                per_page: newPerPage,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     return (
@@ -149,23 +168,24 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-
-
                         <div className="p-6 text-gray-900">
-
-
-                            <div className="mb-4 flex justify-between items-center">
-                                <form onSubmit={handleSearch} className="flex items-center space-x-2">
+                            <div className="mb-4 flex items-center justify-between">
+                                <form
+                                    onSubmit={handleSearch}
+                                    className="flex items-center space-x-2"
+                                >
                                     <input
                                         type="text"
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={(e) =>
+                                            setSearchTerm(e.target.value)
+                                        }
                                         placeholder="Search users..."
-                                        className="border rounded-l px-2 py-1"
+                                        className="rounded-l border px-2 py-1"
                                     />
                                     <button
                                         type="submit"
-                                        className="bg-blue-500 text-white px-4 py-1 rounded-r"
+                                        className="rounded-r bg-blue-500 px-4 py-1 text-white"
                                     >
                                         Search
                                     </button>
@@ -173,12 +193,14 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
                                     <select
                                         value={perPage}
                                         onChange={handlePerPageChange}
-                                        className="appearance-none bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2.5 pr-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        className="block w-40 appearance-none rounded-lg border border-gray-300 bg-white p-2.5 pr-8 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                                     >
                                         <option value="10">10 per page</option>
                                         <option value="25">25 per page</option>
                                         <option value="50">50 per page</option>
-                                        <option value="100">100 per page</option>
+                                        <option value="100">
+                                            100 per page
+                                        </option>
                                     </select>
                                 </form>
 
@@ -190,68 +212,132 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
                                 </button>
                             </div>
 
-
                             <table className="min-w-full">
                                 <thead>
-                                <tr>
-                                <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
-                                        <Link
-                                            href={route('admin.jobs', {
-                                                sort: 'id',
-                                                direction: sort === 'id' && direction === 'asc' ? 'desc' : 'asc'
-                                            })}
-                                            className={`${sort === 'id' ? 'font-bold' : ''}`}
-                                        >
-                                            Id {sort === 'id' && (direction === 'asc' ? '▲' : '▼')}
-                                        </Link>
-                                    </th>
-                                    <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
-                                        <Link
-                                            href={route('admin.jobs', {
-                                                sort: 'address',
-                                                direction: sort === 'address' && direction === 'asc' ? 'desc' : 'asc'
-                                            })}
-                                            className={`${sort === 'address' ? 'font-bold' : ''}`}
-                                        >
-                                            Address {sort === 'address' && (direction === 'asc' ? '▲' : '▼')}
-                                        </Link>
-                                    </th>
-                                    <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
-                                        Actions
-                                    </th>
-                                </tr>
+                                    <tr>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            <Link
+                                                href={route('admin.jobs', {
+                                                    sort: 'id',
+                                                    direction:
+                                                        sort === 'id' &&
+                                                        direction === 'asc'
+                                                            ? 'desc'
+                                                            : 'asc',
+                                                })}
+                                                className={`${sort === 'id' ? 'font-bold' : ''}`}
+                                            >
+                                                Id{' '}
+                                                {sort === 'id' &&
+                                                    (direction === 'asc'
+                                                        ? '▲'
+                                                        : '▼')}
+                                            </Link>
+                                        </th>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            <Link
+                                                href={route('admin.jobs', {
+                                                    sort: 'address',
+                                                    direction:
+                                                        sort === 'address' &&
+                                                        direction === 'asc'
+                                                            ? 'desc'
+                                                            : 'asc',
+                                                })}
+                                                className={`${sort === 'address' ? 'font-bold' : ''}`}
+                                            >
+                                                Address{' '}
+                                                {sort === 'address' &&
+                                                    (direction === 'asc'
+                                                        ? '▲'
+                                                        : '▼')}
+                                            </Link>
+                                        </th>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            <Link
+                                                href={route('admin.jobs', {
+                                                    sort: 'status',
+                                                    direction:
+                                                        sort === 'status' &&
+                                                        direction === 'asc'
+                                                            ? 'desc'
+                                                            : 'asc',
+                                                })}
+                                                className={`${sort === 'status' ? 'font-bold' : ''}`}
+                                            >
+                                                Status{' '}
+                                                {sort === 'status' &&
+                                                    (direction === 'asc'
+                                                        ? '▲'
+                                                        : '▼')}
+                                            </Link>
+                                        </th>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            <Link
+                                                href={route('admin.jobs', {
+                                                    sort: 'date_inspection',
+                                                    direction:
+                                                        sort ===
+                                                            'date_inspection' &&
+                                                        direction === 'asc'
+                                                            ? 'desc'
+                                                            : 'asc',
+                                                })}
+                                                className={`${sort === 'date_inspection' ? 'font-bold' : ''}`}
+                                            >
+                                                Inspection date{' '}
+                                                {sort === 'date_inspection' &&
+                                                    (direction === 'asc'
+                                                        ? '▲'
+                                                        : '▼')}
+                                            </Link>
+                                        </th>
+                                        <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                            Actions
+                                        </th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                {jobs.data.map((job) => (
-                                    <Job key={job.id} job={job} openEditModal={openEditModal}
-                                          openDeleteModal={openDeleteModal} />
-                                ))}
+                                    {jobs.data.map((job) => (
+                                        <Job
+                                            key={job.id}
+                                            job={job}
+                                            openEditModal={openEditModal}
+                                            openDeleteModal={openDeleteModal}
+                                        />
+                                    ))}
                                 </tbody>
                             </table>
 
-
-                            <div className="flex items-center justify-center space-x-2 mt-4">
+                            <div className="mt-4 flex items-center justify-center space-x-2">
                                 {jobs.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url}
-                                        className={`px-3 py-1 rounded ${
+                                        className={`rounded px-3 py-1 ${
                                             link.active
                                                 ? 'bg-blue-500 text-white'
                                                 : 'bg-gray-200 text-gray-700 hover:bg-blue-100'
                                         }`}
                                     >
                                         {link.label === '&laquo;' ? (
-                                            <span>&#8592; {/* Left Arrow */}</span>
+                                            <span>
+                                                &#8592; {/* Left Arrow */}
+                                            </span>
                                         ) : link.label === '&raquo;' ? (
-                                            <span>&#8594; {/* Right Arrow */}</span>
+                                            <span>
+                                                &#8594; {/* Right Arrow */}
+                                            </span>
                                         ) : (
-                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                            <span
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
                                         )}
                                     </Link>
                                 ))}
                             </div>
-
 
                             <Modal show={showModal} onClose={handleClose}>
                                 <form onSubmit={submitForm} className="p-6">
@@ -272,7 +358,10 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
                                             className="mt-1 block w-full"
                                             value={data.address}
                                             onChange={(e) =>
-                                                setData('address', e.target.value)
+                                                setData(
+                                                    'address',
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                         />
@@ -281,6 +370,81 @@ export default function Index({ auth, jobs, sort, direction, search, per_page })
                                             className="mt-2"
                                         />
                                     </div>
+
+                                    <div className="mt-6">
+                                        <InputLabel
+                                            htmlFor="status"
+                                            value="Status"
+                                        />
+                                        {/* <TextInput
+                                            id="name"
+                                            type="text"
+                                            className="mt-1 block w-full"
+                                            value={data.address}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'address',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            required
+                                        /> */}
+
+                                        <select
+                                            value={data.status}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'status',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="mt-1 w-full max-w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        >
+                                            <option value="pending">
+                                                Booked
+                                            </option>
+                                            <option value="in_progress">
+                                                In Progress
+                                            </option>
+                                            <option value="completed">
+                                                Completed
+                                            </option>
+                                            <option value="cancelled">
+                                                Cancelled
+                                            </option>
+                                        </select>
+
+                                        <InputError
+                                            message={errors.address}
+                                            className="mt-2"
+                                        />
+                                    </div>
+
+                                    {editingJob && (
+                                        <div className="mt-6">
+                                            <InputLabel
+                                                htmlFor="date_inspection"
+                                                value="Inspection date"
+                                            />
+                                            <TextInput
+                                                id="date_inspection"
+                                                type="date"
+                                                className="mt-1 block w-full"
+                                                value={data.date_inspection}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'date_inspection',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                required
+                                            />
+                                            <InputError
+                                                message={errors.date_inspection}
+                                                className="mt-2"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* <div className="mt-6">
                                         <InputLabel
