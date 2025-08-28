@@ -10,19 +10,19 @@ function Job({ job, openEditModal, openDeleteModal }) {
             </td>
             <td className="border-b border-gray-200 px-6 py-4">
                 <span
-                    className={`${job.status === 'pending' ? 'bg-blue-500' : job.status === 'in_progress' ? 'bg-yellow-500' : job.status === 'completed' ? 'bg-green-500' : 'bg-red-500'} rounded px-2 py-0.5 text-white`}
+                    className={`${job.status === 'Ready to Book' ? 'bg-indigo-500' : job.status === 'Booked' ? 'bg-blue-500' : job.status === 'in_progress' ? 'bg-yellow-500' : job.status === 'completed' ? 'bg-green-500' : 'bg-red-500'} rounded px-2 py-0.5 text-white`}
                 >
-                    {job.status === 'pending'
-                        ? 'Pending'
-                        : job.status === 'in_progress'
-                          ? 'In progress'
-                          : job.status === 'completed'
-                            ? 'Completed'
-                            : 'Cancelled'}
+                    {job.status === 'Ready to Book'
+                        ? 'Ready to Book'
+                        : job.status === 'Booked'
+                            ? 'Booked'
+                            : job.status === 'in_progress'
+                                ? 'In Progress'
+                                : 'Completed'}
                 </span>
             </td>
             <td className="border-b border-gray-200 px-6 py-4">
-                {dayjs(job.date_inspection).format('MMMM D, YYYY')}
+                {dayjs(job.created_at).format('MMMM DD, YYYY')} {/* created_at show kiya gaya */}
             </td>
             <td className="border-b border-gray-200 px-6 py-4">
                 <button

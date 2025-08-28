@@ -40,7 +40,7 @@ export default function Index({ auth, users, sort, direction, search, per_page }
         setEditingUser(null);
         reset();
         setData(defaultValues);
-        clearErrors(); // Add this line
+        clearErrors();
     };
 
     const submitForm = (e) => {
@@ -69,7 +69,7 @@ export default function Index({ auth, users, sort, direction, search, per_page }
     };
 
     const openEditModal = (user) => {
-        clearErrors(); // Add this line
+        clearErrors();
         setEditingUser(user);
         setData({
             name: user.name || '',
@@ -80,7 +80,7 @@ export default function Index({ auth, users, sort, direction, search, per_page }
     };
 
     const openCreateModal = () => {
-        clearErrors(); // Add this line
+        clearErrors();
         setEditingUser(null);
         setData(defaultValues);
         setShowModal(true);
@@ -107,7 +107,8 @@ export default function Index({ auth, users, sort, direction, search, per_page }
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.users'), {
+        // FIX: 'admin.users' ko 'admin.users.index' se tabdeel kiya gaya hai
+        router.get(route('admin.users.index'), {
             search: searchTerm,
             sort,
             direction,
@@ -121,7 +122,8 @@ export default function Index({ auth, users, sort, direction, search, per_page }
     const handlePerPageChange = (e) => {
         const newPerPage = e.target.value;
         setPerPage(newPerPage);
-        router.get(route('admin.users'), {
+        // FIX: 'admin.users' ko 'admin.users.index' se tabdeel kiya gaya hai
+        router.get(route('admin.users.index'), {
             search: searchTerm,
             sort,
             direction,
@@ -147,11 +149,7 @@ export default function Index({ auth, users, sort, direction, search, per_page }
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-
-
                         <div className="p-6 text-gray-900">
-
-
                             <div className="mb-4 flex justify-between items-center">
                                 <form onSubmit={handleSearch} className="flex items-center space-x-2">
                                     <input
@@ -171,7 +169,7 @@ export default function Index({ auth, users, sort, direction, search, per_page }
                                     <select
                                         value={perPage}
                                         onChange={handlePerPageChange}
-                                        className="appearance-none bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2.5 pr-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        className="appearance-none bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2.5 pr-8"
                                     >
                                         <option value="10">10 per page</option>
                                         <option value="25">25 per page</option>
@@ -188,13 +186,13 @@ export default function Index({ auth, users, sort, direction, search, per_page }
                                 </button>
                             </div>
 
-
                             <table className="min-w-full">
                                 <thead>
                                 <tr>
                                 <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                        {/* FIX: 'admin.users' ko 'admin.users.index' se tabdeel kiya gaya hai */}
                                         <Link
-                                            href={route('admin.users', {
+                                            href={route('admin.users.index', {
                                                 sort: 'name',
                                                 direction: sort === 'name' && direction === 'asc' ? 'desc' : 'asc'
                                             })}
@@ -204,8 +202,9 @@ export default function Index({ auth, users, sort, direction, search, per_page }
                                         </Link>
                                     </th>
                                     <th className="border-b-2 border-gray-200 px-6 py-3 text-left">
+                                        {/* FIX: 'admin.users' ko 'admin.users.index' se tabdeel kiya gaya hai */}
                                         <Link
-                                            href={route('admin.users', {
+                                            href={route('admin.users.index', {
                                                 sort: 'email',
                                                 direction: sort === 'email' && direction === 'asc' ? 'desc' : 'asc'
                                             })}
@@ -227,7 +226,6 @@ export default function Index({ auth, users, sort, direction, search, per_page }
                                 </tbody>
                             </table>
 
-
                             <div className="flex items-center justify-center space-x-2 mt-4">
                                 {users.links.map((link, index) => (
                                     <Link
@@ -240,16 +238,15 @@ export default function Index({ auth, users, sort, direction, search, per_page }
                                         }`}
                                     >
                                         {link.label === '&laquo;' ? (
-                                            <span>&#8592; {/* Left Arrow */}</span>
+                                            <span>&#8592;</span>
                                         ) : link.label === '&raquo;' ? (
-                                            <span>&#8594; {/* Right Arrow */}</span>
+                                            <span>&#8594;</span>
                                         ) : (
                                             <span dangerouslySetInnerHTML={{ __html: link.label }} />
                                         )}
                                     </Link>
                                 ))}
                             </div>
-
 
                             <Modal show={showModal} onClose={handleClose}>
                                 <form onSubmit={submitForm} className="p-6">

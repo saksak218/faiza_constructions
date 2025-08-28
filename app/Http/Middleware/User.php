@@ -16,16 +16,17 @@ class User
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!Auth::check()) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
+        
+        $user = Auth::user();
 
-        $userRole = Auth::user()->role;
-
-        if($userRole === 2) {
+        // Role object ki 'id' check ki ja rahi hai
+        if ($user->role && $user->role->id == 2) {
             return $next($request);
         }
 
-        // Redirect all non-user users to dashboard
-        return redirect()->route('admin.dashboard');    }
+        return redirect()->route('admin.dashboard');
+    }
 }

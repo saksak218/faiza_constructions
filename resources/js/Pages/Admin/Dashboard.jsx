@@ -8,13 +8,16 @@ import {
     XCircle,
 } from 'lucide-react';
 
-export default function Dashboard({ jobs }) {
+export default function Dashboard({ auth, jobs }) {
+    // Yahan par ek null check kiya gaya hai taake agar jobs undefined ho to error na aaye
+    const jobsArray = jobs || [];
+
     const statusCounts = {
-        total: jobs.length,
-        pending: jobs.filter((job) => job.status === 'pending').length,
-        in_progress: jobs.filter((job) => job.status === 'in_progress').length,
-        completed: jobs.filter((job) => job.status === 'completed').length,
-        cancelled: jobs.filter((job) => job.status === 'cancelled').length,
+        total: jobsArray.length,
+        pending: jobsArray.filter((job) => job.status === 'pending').length,
+        in_progress: jobsArray.filter((job) => job.status === 'in_progress').length,
+        completed: jobsArray.filter((job) => job.status === 'completed').length,
+        cancelled: jobsArray.filter((job) => job.status === 'cancelled').length,
     };
 
     const statusDetails = [
@@ -67,9 +70,10 @@ export default function Dashboard({ jobs }) {
 
     return (
         <AuthenticatedLayout
+            user={auth.user}
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Admin Dashboard
+                    Dashboard
                 </h2>
             }
         >
@@ -77,7 +81,13 @@ export default function Dashboard({ jobs }) {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6 text-gray-900">
+                            You're logged in!
+                        </div>
+                    </div>
+
+                    <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
                         {statusDetails.map(
                             ({
                                 key,
@@ -112,3 +122,4 @@ export default function Dashboard({ jobs }) {
         </AuthenticatedLayout>
     );
 }
+

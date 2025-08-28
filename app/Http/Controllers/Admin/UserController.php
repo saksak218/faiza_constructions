@@ -12,40 +12,41 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-public function index(Request $request)
-{
-    $perPage = $request->input('per_page', 10);
-    $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 10;
+    public function index(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 10;
 
-    $query = User::query()->where('role', 2);
+        // FIX: 'role' ko 'role_id' se tabdeel kar diya gaya hai
+        $query = User::query()->where('role_id', 2);
 
-    // Existing sorting and search logic
-    $sortableColumns = ['name', 'email', 'created_at'];
-    $sortColumn = $request->input('sort', 'created_at');
-    $sortDirection = $request->input('direction', 'desc');
+        // Existing sorting and search logic
+        $sortableColumns = ['name', 'email', 'created_at'];
+        $sortColumn = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('direction', 'desc');
 
-    if (in_array($sortColumn, $sortableColumns)) {
-        $query->orderBy($sortColumn, $sortDirection === 'asc' ? 'asc' : 'desc');
+        if (in_array($sortColumn, $sortableColumns)) {
+            $query->orderBy($sortColumn, $sortDirection === 'asc' ? 'asc' : 'desc');
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->paginate($perPage)->appends($request->query());
+
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+            'sort' => $sortColumn,
+            'direction' => $sortDirection,
+            'search' => $request->input('search', ''),
+            'per_page' => $perPage
+        ]);
     }
-
-    if ($request->filled('search')) {
-        $search = $request->input('search');
-        $query->where(function($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%");
-        });
-    }
-
-    $users = $query->paginate($perPage)->appends($request->query());
-
-    return Inertia::render('Admin/Users/Index', [
-        'users' => $users,
-        'sort' => $sortColumn,
-        'direction' => $sortDirection,
-        'search' => $request->input('search', ''),
-        'per_page' => $perPage
-    ]);
-}
 
     public function store(Request $request)
     {
@@ -66,7 +67,7 @@ public function index(Request $request)
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => 2,
+            'role_id' => 2, // FIX: 'role' ko 'role_id' se tabdeel kiya gaya hai
         ]);
 
         return redirect()->back()->with('message', 'User created successfully');

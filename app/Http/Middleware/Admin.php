@@ -16,20 +16,17 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        if(!Auth::check()) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
 
-        $userRole = Auth::user()->role;
-        
-        if($userRole === 1) {
+        $user = Auth::user();
+
+        // Role object ki 'id' check ki ja rahi hai
+        if ($user->role && $user->role->id == 1) {
             return $next($request);
         }
-        
 
-        // Redirect all non-admin users to dashboard
         return redirect()->route('dashboard');
-
     }
 }

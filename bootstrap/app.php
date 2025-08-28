@@ -16,11 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        // Middleware aliases yahan register hotay hain
         $middleware->alias([
             'admin' => \App\Http\Middleware\Admin::class,
             'user' => \App\Http\Middleware\User::class,
+            
+            // Yeh line add ki gayi hai
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
-        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
